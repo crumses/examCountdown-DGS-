@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DGS // OPERATION FINAL COUNTDOWN</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+body{
+    overflow:hidden;
+    height:100vh;
+    background:#050505;
+    font-family:'Cormorant Garamond', serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#e5e5e5;
+    position:relative;
+}
+.full-bg {
+    position: fixed;
+    inset: 0;
+    background: url("art.jpg") center center/cover no-repeat;
+    opacity: 0.25; 
+    z-index: 1;
+    filter: blur(3px); 
+}
+.overlay-dark {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 5, 0.6);
+    z-index: 2;
+}
+.intro-overlay {
+    position: fixed;
+    inset: 0;
+    background: #030303;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1.2s ease, visibility 1.2s;
+}
+.intro-btn {
+    background: transparent;
+    border: 1px solid #c5a880;
+    color: #c5a880;
+    font-family: 'Cinzel', serif;
+    padding: 16px 45px;
+    font-size: 0.95rem;
+    letter-spacing: 5px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    border-radius: 2px;
+    z-index: 101;
+}
+.intro-btn:hover {
+    background: #c5a880;
+    color: #050505;
+    box-shadow: 0 0 25px rgba(197, 168, 128, 0.3);
+}
+.vignette{
+    position:fixed;
+    inset:0;
+    box-shadow:inset 0 0 250px rgba(0,0,0,0.95);
+    pointer-events:none;
+    z-index: 4;
+}
+.container{
+    position:relative;
+    z-index:5;
+    text-align:center;
+    width:85%;
+    max-width:850px;
+    padding:65px 40px;
+    background: linear-gradient(rgba(10, 10, 10, 0.82), rgba(5, 5, 5, 0.88)), url("art.jpg") center center/cover no-repeat;
+    border: 1px solid rgba(197, 168, 128, 0.25);
+    box-shadow: 0 20px 70px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8);
+    border-radius: 4px;
+    transition: transform 0.1s ease-out;
+}
+.top-text{
+    font-family: 'Cinzel', serif;
+    font-size:0.8rem;
+    letter-spacing:6px;
+    color:#888888;
+    margin-bottom:25px;
+}
+.title{
+    font-family: 'Cinzel', serif;
+    font-size: 2.3rem;
+    font-weight: 400;
+    color: #c5a880; 
+    letter-spacing: 9px;
+    text-shadow: 0 0 15px rgba(197, 168, 128, 0.15);
+    margin-bottom:45px;
+}
+.timer{
+    font-family: 'Cinzel', serif;
+    font-size:4.2rem;
+    font-weight:400;
+    color:#ffffff;
+    letter-spacing: 5px;
+    margin-bottom: 45px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.sub{
+    color:#b3b3b3;
+    font-size:1.15rem;
+    font-style: italic;
+    letter-spacing:1px;
+    min-height: 28px;
+}
+.total{
+    margin-top:40px;
+    color:#5a5a5a;
+    font-family: 'Cinzel', serif;
+    line-height: 2.2;
+    font-size:0.75rem;
+    letter-spacing: 3px;
+    border-top: 1px solid rgba(197, 168, 128, 0.1);
+    padding-top: 20px;
+}
+.danger .title {
+    color: #a32a2a;
+    text-shadow: 0 0 15px rgba(163, 42, 42, 0.2);
+}
+.danger .top-text {
+    color: #a32a2a;
+}
+@media(max-width:700px){
+    .title{ font-size:1.4rem; letter-spacing: 5px; }
+    .timer{ font-size:2.0rem; letter-spacing: 2px; }
+    .container{ padding:45px 20px; width: 92%; }
+    .top-text{ letter-spacing:4px; font-size:.7rem; }
+    .sub{ font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="intro-overlay" id="intro">
+    <button class="intro-btn" onclick="startMission()">INITIATE MISSION</button>
+</div>
+
+<div class="full-bg"></div>
+<div class="overlay-dark"></div>
+<div class="vignette"></div>
+
+<audio id="bgMusic" loop preload="auto">
+    <source src="skyfall.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="tickSound" preload="auto">
+    <source src="shot.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container" id="container">
+    <div class="top-text" id="status-text">
+        CLASSIFIED STATUS // ENCRYPTED LINK
+    </div>
+    <div class="title">
+        OPERATION DGS
+    </div>
+    <div class="timer" id="count">
+        00 : 00 : 00 : 00
+    </div>
+    <div class="sub" id="quote-area">
+        "Loading intelligence..."
+    </div>
+    <div class="total" id="totals"></div>
+</div>
+
+<script>
+const quotes = [
+    "Time is a luxury we do not have. — M (Skyfall)",
+    "A license to kill is also a license to die. — James Bond",
+    "The past is a country we can't return to. — John le Carré",
+    "The world is not enough. — Ian Fleming",
+    "Live and let die. — Ian Fleming",
+    "Skyfall is where the past catches up with you. — James Bond",
+    "We all have our secrets. We just have to decide who gets to know them. — Mary Watson",
+    "There's no shame in admitting to a state of panic. — Gareth Mallory",
+    "Sometimes the old ways are the best. — Kincade",
+    "A gun and a radio. Not exactly Christmas, is it? — James Bond",
+    "Every mission leaves a scar. — John le Carré",
+    "The name is Bond. James Bond. — James Bond",
+    "Regret is an unprofessional emotion. — M (GoldenEye)",
+    "We are not here to change the world. We are here to survive it. — Robert Ludlum",
+    "Trust is a commodity in short supply. — Tom Clancy",
+    "Keep your eyes on the target, even when it's moving. — Jason Bourne",
+    "A shadow is just light waiting to be discovered. — Alan Furst",
+    "The brightest light casts the darkest shadow. — Sun Tzu",
+    "Information is the ultimate weapon. — Tom Clancy",
+    "Silence is often the loudest answer. — Sun Tzu",
+    "To survive a war, you must become war. — John Rambo",
+    "Every secret has an expiration date. — Graham Greene",
+    "The truth is rarely pure and never simple. — Oscar Wilde",
+    "In our line of work, friends are just liabilities. — John le Carré",
+    "A ghost cannot be killed, but it can be found. — Jason Bourne",
+    "History is written by those who survive. — Robert Ludlum",
+    "The code of silence is the only law that lasts. — Jack Higgins",
+    "An agent is only as good as their last choice. — Ethan Hunt",
+    "Nothing is hidden forever under the sky. — Frederick Forsyth",
+    "The best cover is the truth no one believes. — John le Carré",
+    "When you look into the abyss, the abyss also looks into you. — Friedrich Nietzsche",
+    "Danger is a habit you can't break. — Ian Fleming",
+    "Fear is an instructor of great sagacity. — Edmund Burke",
+    "Keep your friends close and your enemies under surveillance. — Al Pacino (The Godfather)",
+    "The mirror reflects your face, but your actions reflect your soul. — Confucius",
+    "There are no permanent allies, only permanent interests. — Lord Palmerston",
+    "A calculated risk is still a gamble. — John le Carré",
+    "The clock doesn't stop for anyone. — Tom Clancy",
+    "Survival demands adaptation. — Charles Darwin",
+    "A quiet target is a dead target. — Chris Ryan",
+    "The art of deception is knowing when to tell the truth. — Robert Ludlum",
+    "Loyalty is a dynamic concept. — John le Carré",
+    "Never let them see you bleed. — MI6 Maxim",
+    "A clean shot requires a cold heart. — Agent 47",
+    "The game is won before it even starts. — Sun Tzu",
+    "No one leaves the service with their hands entirely clean. — M (Casino Royale)",
+    "Behind every great fortune is a crime. — Honoré de Balzac",
+    "Memory can be a beautiful trap. — John le Carré",
+    "The digital age left no place to hide. — Edward Snowden",
+    "We don't choose the mission. The mission chooses us. — Ethan Hunt",
+    "Shadows have ears, and walls have eyes. — English Proverb",
+    "Every alliance is built on a foundation of mutual distrust. — Robert Ludlum",
+    "The finest steel has to go through the hottest fire. — Richard Nixon",
+    "A true professional leaves no footprint. — MI6 Protocol",
+    "To catch a wolf, you must think like a wolf. — Alonzo Harris",
+    "The threat you don't see is the one that kills you. — Tom Clancy",
+    "Control the narrative, control the world. — George Orwell",
+    "Anonymity is a shield, but also a prison. — John le Carré",
+    "The cost of freedom is high, but the price of betrayal is higher. — Captain America",
+    "Chaos is a ladder we climb in the dark. — Petyr Baelish",
+    "Everything is a weapon if you hold it right. — Jason Bourne",
+    "A strategic retreat is not a defeat. — Sun Tzu",
+    "The element of surprise is your greatest asset. — Hannibal Barca",
+    "A master of disguise is never himself. — Arthur Conan Doyle",
+    "In the kingdom of the blind, the one-eyed man is king. — Desiderius Erasmus",
+    "Truth is a luxury reserved for those who aren't being hunted. — Eric Ambler",
+    "A locked door is just an invitation. — Sherlock Holmes",
+    "Trust the process, doubt the people. — Robert Ludlum",
+    "The endgame is already set. — Doctor Strange",
+    "You can't outrun your shadow, but you can hide in it. — Len Deighton",
+    "Precision beats power; timing beats speed. — Conor McGregor",
+    "An open secret is a dangerous game. — Graham Greene",
+    "The deepest waters are always the quietest. — Quintus Curtius Rufus",
+    "A modern spy operates in the open. — John le Carré",
+    "The worst betrayal always comes from within. — Julius Caesar",
+    "Keep moving, or become a monument. — Alec Trevelyan",
+    "A good agent is invisible. — CIA Manual",
+    "Power is nothing without absolute control. — Vince McMahon",
+    "The grid knows everything, but understands nothing. — Tom Clancy",
+    "Knowledge is power, but discretion is safety. — Samuel Johnson",
+    "The wire knows no boundaries. — David Simon",
+    "Every ending is just a new operation. — Ethan Hunt",
+    "The contract is binding until death do us part. — Agent 47",
+    "There are no rules in the dark. — Splinter Cell",
+    "A clean slate is a myth. — Batman (The Dark Knight Rises)",
+    "The agency never forgets, and rarely forgives. — Jason Bourne",
+    "You are only a number until you fail. — Number Six (The Prisoner)",
+    "The silence before the storm is where we live. — Ghost Recon",
+    "A blind spot is a dangerous luxury. — Tom Clancy",
+    "No trace left behind. — Special Forces Motto",
+    "The compromise is the first step toward failure. — John le Carré",
+    "Watch the watchers. — Juvenal",
+    "The algorithm has no mercy. — Cyberpunk Maxim",
+    "An asset is only useful while it's breathing. — John le Carré",
+    "The cold war never truly ended. — Vladimir Putin",
+    "Everything has a price, even loyalty. — Raymond Reddington",
+    "The final countdown has already begun. — Operation DGS Command",
+    "History repeats itself, first as tragedy, second as a mission. — Karl Marx (Adapted)",
+    "The operative words are absolute discretion. — MI6 Briefing",
+    "There is no reset button in reality. — Jason Bourne",
+    "There is no room for error when the clock is ticking. — Jack Bauer (24)",
+    "Victory awaits those who have everything in order. — Roald Amundsen",
+    "The only asset you can completely trust is your own preparation. — CIA Operative Guideline",
+    "Discipline is the bridge between goals and accomplishment. — Jim Rohn",
+    "Under pressure, you don't rise to the level of your expectations, you fall to the level of your training. — Archilochus",
+    "An operative does not wait for inspiration, he creates results. — Robert Ludlum",
+    "Focus on the solution, not the obstacle. The target remains the same. — Sniper Creed",
+    "In the theater of operation, hesitation is the ultimate enemy. — Alec Trevelyan",
+    "Success is not a random event; it is a calculated execution. — Tom Clancy",
+    "The shield of focus breaks the arrows of distraction. — Sun Tzu",
+    "Your greatest weapon is a mind that remains calm under fire. — Samurai Maxim",
+    "When the final countdown begins, emotions must yield to execution. — MI6 Protocol",
+    "Great operators are built in the hours that no one sees. — Special Air Service (SAS)",
+    "Every page turned is a barrier destroyed. Move forward. — Operation DGS Command",
+    "Leave nothing to chance. A perfect plan requires flawless preparation. — Sherlock Holmes"
+];
+
+function setRandomQuote() {
+    const idx = Math.floor(Math.random() * quotes.length);
+    document.getElementById("quote-area").innerHTML = `"${quotes[idx]}"`;
+}
+
+const targetDate = new Date("2026-07-19T10:15:00").getTime();
+const displayEl = document.getElementById("count");
+const totalDisplayEl = document.getElementById("totals");
+const uiContainer = document.getElementById("container");
+const headerStatus = document.getElementById("status-text");
+
+let previousSec = -1;
+
+function updateCountdown(){
+    const current = Date.now();
+    const diff = targetDate - current;
+
+    if(diff <= 0){
+        displayEl.innerHTML = "MISSION CONCLUDED";
+        return;
+    }
+
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 600000);
+    const secs = Math.floor((diff % 60000) / 1000);
+
+    if(secs !== previousSec) {
+        const tick = document.getElementById("tickSound");
+        if(tick) {
+            tick.volume = 0.20;
+            tick.currentTime = 0;
+            tick.play().catch(() => {});
+        }
+        previousSec = secs;
+    }
+
+    const totalHours = Math.floor(diff / 3600000);
+    const totalMins = Math.floor(diff / 60000);
+    const totalSecs = Math.floor(diff / 1000);
+
+    displayEl.innerHTML =
+        `${String(days).padStart(2,'0')} :  
+         ${String(hours).padStart(2,'0')} :  
+         ${String(mins).padStart(2,'0')} :  
+         ${String(secs).padStart(2,'0')}`;
+
+    totalDisplayEl.innerHTML = `
+        TOTAL: ${totalHours.toLocaleString('tr-TR')} HOURS //  
+        ${totalMins.toLocaleString('tr-TR')} MINUTES //  
+        ${totalSecs.toLocaleString('tr-TR')} SECONDS
+    `;
+
+    if(days <= 10){
+        document.body.classList.add("danger");
+        headerStatus.innerHTML = "CRITICAL WINDOW // IMMEDIATE ACTION REQUIRED";
+    }
+}
+
+setRandomQuote();
+updateCountdown();
+
+setInterval(updateCountdown, 200);
+
+document.addEventListener("mousemove",(e)=>{
+    const x = (e.clientX / window.innerWidth - 0.5) * 10;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
+    uiContainer.style.transform = `translate(${x}px, ${y}px)`;
+});
+
+function startMission() {
+    const bgTrack = document.getElementById("bgMusic");
+    const sfxTrack = document.getElementById("tickSound");
+    
+    bgTrack.volume = 0.35; 
+    bgTrack.play().catch(() => {});
+    
+    if(sfxTrack) {
+        sfxTrack.volume = 0.01;
+        sfxTrack.play().catch(() => {});
+    }
+
+    const introScreen = document.getElementById("intro");
+    introScreen.style.opacity = "0";
+    setTimeout(() => {
+        introScreen.style.display = "none";
+    }, 1200);
+}
+</script>
+
+</body>
+</html>
