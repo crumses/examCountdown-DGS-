@@ -157,10 +157,6 @@ body{
     <source src="skyfall.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="tickSound" preload="auto">
-    <source src="shot.mp3" type="audio/mpeg">
-</audio>
-
 <div class="container" id="container">
     <div class="top-text" id="status-text">
         CLASSIFIED STATUS // ENCRYPTED LINK
@@ -307,8 +303,6 @@ const totalDisplayEl = document.getElementById("totals");
 const uiContainer = document.getElementById("container");
 const headerStatus = document.getElementById("status-text");
 
-let previousSec = -1;
-
 function updateCountdown(){
     const current = Date.now();
     const diff = targetDate - current;
@@ -322,16 +316,6 @@ function updateCountdown(){
     const hours = Math.floor((diff % 86400000) / 3600000);
     const mins = Math.floor((diff % 3600000) / 60000);
     const secs = Math.floor((diff % 60000) / 1000);
-
-    if(secs !== previousSec) {
-        const tick = document.getElementById("tickSound");
-        if(tick) {
-            tick.volume = 0.20;
-            tick.currentTime = 0;
-            tick.play().catch(() => {});
-        }
-        previousSec = secs;
-    }
 
     const totalHours = Math.floor(diff / 3600000);
     const totalMins = Math.floor(diff / 60000);
@@ -368,15 +352,9 @@ document.addEventListener("mousemove",(e)=>{
 
 function startMission() {
     const bgTrack = document.getElementById("bgMusic");
-    const sfxTrack = document.getElementById("tickSound");
     
     bgTrack.volume = 0.35; 
     bgTrack.play().catch(() => {});
-    
-    if(sfxTrack) {
-        sfxTrack.volume = 0.01;
-        sfxTrack.play().catch(() => {});
-    }
 
     const introScreen = document.getElementById("intro");
     introScreen.style.opacity = "0";
